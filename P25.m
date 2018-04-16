@@ -22,7 +22,7 @@ p.rho_b = 0.4*p.rho_w;
 
 p.l = 3;
 p.w = 5; 
-p.h = 10;
+p.h = 1;
 
 p.m = p.l*p.w*p.h*p.rho_b;
 
@@ -35,21 +35,21 @@ p.hw = (p.rho_b / p.rho_w) * p.h;
 
 %% Part Bi - Euler's Bouyancy Method
 sub_vol = p.l*p.w*p.hw;
-theta  = deg2rad(1);
+theta  = deg2rad(10);
 % this is a triangle
 M_W_B  = [1/12*p.rho_w*p.g*p.l*theta*(p.w)^3; 0; 0];
 r_C0relW_B = [0; 0; -p.hw/2];
 r_GrelW_B  = [0; 0;  p.h/2-p.hw];
 F_grav_B   = p.m*p.g*[0; sin(theta); -cos(theta)];
 F_bouy_B   = sub_vol*p.rho_w*p.g*[0; -sin(theta); cos(theta)];
-Msum_W     = M_W_B + cross(r_C0relW_B, F_bouy_B) + cross(r_GrelW_B, F_grav_B)
+Msum_W     = M_W_B + cross(r_C0relW_B, F_bouy_B) + cross(r_GrelW_B, F_grav_B);
 
 %% initial conditions
-boat_G_F_0  = [0; 0; p.h/2 - p.hw];
+boat_G_F_0  = [0; 0; p.h/2 - 0.8*p.hw];
 
 v_G_F_0     = [0; 0; 0];
 
-R_0 = angle2dcm(deg2rad(0), deg2rad(0.0), theta);
+R_0 = angle2dcm(deg2rad(0), deg2rad(-4), theta);
 
 w_B_0 = [0; 0; 0];  w_F_0 = R_0 * w_B_0;
 
@@ -123,7 +123,7 @@ R_sol   = sol(:, 10:18);
 filename = 'Buoyant Block';
 v = VideoWriter(filename);
 open(v);
-time_frac = 0.4;
+time_frac = 1;
 tic
 start = toc;
 i = 0;
@@ -159,7 +159,7 @@ while start < tf
     sub_C.ZData     = sub_C_F(3);
     
     % recording stuff
-    writeVideo(v,getframe(gcf));
+%     writeVideo(v,getframe(gcf));
     
     % timing stuff
     dt = tf/n - (toc*time_frac - start);
@@ -186,11 +186,11 @@ function zdot = RHS_cent(t, z_t, p)
     % LMB    
     F_grav_F    = [0; 0; -p.g*p.m];
     F_bouy_F    = [0; 0;  p.g*p.rho_w*vol_sub];
-    Fsum_F      = F_grav_F + F_bouy_F
+    Fsum_F      = F_grav_F + F_bouy_F;
     a_G_F       = Fsum_F/p.m;
     
     % AMB
-    Msum_G_F    = cross(sub_C_F, F_bouy_F) + cross(r_G_F, F_grav_F)
+    Msum_G_F    = cross(sub_C_F, F_bouy_F) + cross(r_G_F, F_grav_F);
     I           = R*p.I_B*R';
     w_dot       = I \ ( Msum_G_F - cross(w_F, I*w_F) );
     R_dot       = skew(w_F)*R;
