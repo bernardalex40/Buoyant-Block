@@ -121,8 +121,8 @@ R_sol   = sol(:, 10:18);
 
 %% animate results
 filename = 'Buoyant Block';
-v = VideoWriter(filename);
-open(v);
+% v = VideoWriter(filename);
+% open(v);
 time_frac = 1;
 tic
 start = toc;
